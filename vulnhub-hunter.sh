@@ -9,14 +9,11 @@
 function loadInfo(){
 	# step 1: gets your ip
 	export ATTACKER_IP_ADDY=$(hostname -I | awk '{print $1}')
-
 	# step 2: arp scans for you, finds your target IP and saves it to a variable
 	export TARGET_IP=$(sudo arp-scan --interface eth0 $ATTACKER_IP_ADDY/24 | grep 'PCS System' | awk '{print $1}')
-
 }
 
 function loadingAnimation(){
-
 	# to let the arp-scan show first
 	sleep 0.25
 	# show some sort of load animation
@@ -32,6 +29,7 @@ function loadingAnimation(){
     		done
 	done
 }
+##############################      main()      ########################################
 # run them together to have cool vibes:
 loadInfo &
 loadingAnimation &
