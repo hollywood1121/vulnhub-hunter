@@ -52,23 +52,20 @@ echo "\$TARGET_IP: $TARGET_IP"
 
 
 ################################################ TMUX BABY #######################################
-
-#high level plan:
-# 1. quick scan && -p- host on all hosts,
-
-# 2. then -sC -sV hosts once we can identify the smaller fish
-
-#3. use logic and parse for open ports for http and run gobuster, nikto,  after second run through
-
+#************* HEADS UP ****************#
+# functions aliases nq, ne must be defined as an alias in bashrc or .zshrc.
+# these functions are found in the nmap-scripts folder.
 
 
 
 # Step 5: begin making window panes with specific tasks.
 # cd first into the right home dir
-# pane 1: nmap quick scan,
+# pane 1: nmap quicky
+# run the nmap quick scan + default scan in one window
 
 tmux send-keys "cd $HOME_DIR" C-m
-nmap --top-ports 1000 -Pn -T4 -oN $HOME_DIR/nmap/$TARGET_IP-top-1000 $TARGET_IP
+tmux send-keys "source nmap-scripts/nmap-quick.sh" C-m
+
 
 
 # pane 2: gobuster directories
@@ -76,13 +73,13 @@ nmap --top-ports 1000 -Pn -T4 -oN $HOME_DIR/nmap/$TARGET_IP-top-1000 $TARGET_IP
 $(tmux -v split-window -h)
  tmux send-keys "cd $HOME_DIR" C-m
  tmux send-keys "source $HOME_DIR/.$TARGET_IP-env_vars" C-m
- tmux send-keys "nmap -p- -sC -sV -Pn -oN $HOME_DIR/nmap/$TARGET_IP-allports $TARGET_IP" C-m
+ tmux send-keys "source nmap-scripts/nmap-everything-allports.sh" C-m
 
 #tmux send-keys "gobuster dir -u $TARGET_IP -w /usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt -o $HOME_DIR/recon/$TARGET_IP-gb-directories"
 
 # pane 1: gobuster large files
+$(tmux -v split-window)
+tmux send-keys "cd $HOME_DIR" C-m
+tmux send-keys "source $HOME_DIR/.$HTB_NAME-env_vars" C-m
 
-#$(tmux -v split-window)
-#tmux send-keys "cd $HOME_DIR" C-m
-#tmux send-keys "source $HOME_DIR/.$TARGET_IP-env_vars" C-m
-#tmux send-keys "gobuster dir -u $TARGET_IP -w /usr/share/seclists/Discovery/Web-Content/raft-large-files.txt -o $HOME_DIR/recon/$TARGET_IP-gb-files"
+tmux send-keys "gobuster dir -u $TARGET_IP -w /usr/share/seclists/Discovery/Web-Content/raft-large-files.txt -o $HOME_DIR/recon/$HTB_NAME-files"
