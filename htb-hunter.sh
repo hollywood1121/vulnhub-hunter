@@ -13,9 +13,10 @@ read -p 'Target Name: ' target
 read -p 'Target IP: ' target_ip
 export TARGET_IP=$target_ip
 export HTB_NAME=$target
+export HUNTERDIR=$PWD
 
 # step 3a: define local main directory name for brevity
-export HOME_DIR=/home/kali/Practice/htb/$HTB_NAME/
+export HOME_DIR=/home/kali/Practice/htb/$HTB_NAME
 
 
 # step 4a: Make sure Target name exists, then build directories around it.
@@ -36,12 +37,15 @@ fi
 # there's no other way around it since this bash file is operating as as child node
 # and has no persistence because we'll be referencing things in the parent session.
 
+# hunterdir, Home_dir, HTB_name are used as a reference for nmap scripts to know where to print out
 echo "export ATTACKER_IP_ADDY=$ATTACKER_IP_ADDY" >> $HOME_DIR/.$HTB_NAME-env_vars
 echo "export TARGET_IP=$TARGET_IP" >> $HOME_DIR/.$HTB_NAME-env_vars
-
+echo "export HOME_DIR=$HOME_DIR" >> $HOME_DIR/.$HTB_NAME-env_vars
+echo "export HUNTERDIR=$PWD" >> $HOME_DIR/.$HTB_NAME-env_vars
+echo "export HTB_NAME=$HTB_NAME" >> $HOME_DIR/.$HTB_NAME-env_vars
 
 tmux send-keys "source $HOME_DIR/.$HTB_NAME-env_vars" C-m
-clear
+#clear
 
 # display basic info so user knows whats up, also run the command to bring in env variables.
 echo -e "\nInstantiating session environmental vars:"
@@ -64,7 +68,7 @@ echo "\$TARGET_IP: $TARGET_IP"
 # run the nmap quick scan + default scan in one window
 
 tmux send-keys "cd $HOME_DIR" C-m
-tmux send-keys "source nmap-scripts/nmap-quick.sh" C-m
+tmux send-keys "source $HUNTERDIR/nmap-scripts/nmap-quick.sh" C-m
 
 
 
@@ -72,12 +76,12 @@ tmux send-keys "source nmap-scripts/nmap-quick.sh" C-m
 
 $(tmux -v split-window -h)
  tmux send-keys "cd $HOME_DIR" C-m
- tmux send-keys "source $HOME_DIR/.$TARGET_IP-env_vars" C-m
- tmux send-keys "source nmap-scripts/nmap-everything-allports.sh" C-m
+ tmux send-keys "source $HOME_DIR/.$HTB_NAME-env_vars" C-m
+ tmux send-keys "source $HUNTERDIR/nmap-scripts/nmap-everything-allports.sh" C-m
 
-#tmux send-keys "gobuster dir -u $TARGET_IP -w /usr/share/seclists/Discovery/Web-Content/raft-large-directories.txt -o $HOME_DIR/recon/$TARGET_IP-gb-directories"
 
-# pane 1: gobuster large files
+
+# pane 3: gobuster large files
 $(tmux -v split-window)
 tmux send-keys "cd $HOME_DIR" C-m
 tmux send-keys "source $HOME_DIR/.$HTB_NAME-env_vars" C-m
